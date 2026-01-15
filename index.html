@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HK IPO Decision Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+      /* Custom scrollbar for tables */
+      .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+      }
+      .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+      }
+      
+      @media print {
+        @page { margin: 1cm; size: A4; }
+        body { background-color: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        .no-print { display: none !important; }
+        .print-break-inside-avoid { break-inside: avoid; }
+        .print-break-before { break-before: page; }
+        header, section[class*="shadow-sm"] { box-shadow: none !important; border: none !important; }
+        aside { display: none !important; } /* Hide sidebar in print */
+        main { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+        .print-full-width { grid-column: span 12 / span 12 !important; }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "recharts": "https://esm.sh/recharts@^3.6.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.35.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
