@@ -45,9 +45,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (data) {
                 setProfile(data as Profile);
             } else {
-                // If profile doesn't exist (e.g. first login), create a default one locally or handle appropriately
-                // For now, we assume trigger creates it or we manually create it in Register workflow
-                console.warn('No profile found for user');
+                // [Antigravity Idea]: If profile doesn't exist for a logged-in user, auto-create it.
+                // This fixes cases where users were created via Auth dashboard but missed a profile row.
+                console.log('Profile missing, creating auto-profile for:', userId);
+                const { data: newData, error: insertError } = await supabase
+                    .from('profiles')
+                    .insert([{ id: userId, email: user?.email || '', tier: 'free', role: 'user' }])
+                    .select()
+                    .single();
+
+                if (newData) setProfile(newData as Profile);
+                if (insertError) console.error('Failed to auto-create profile:', insertError);
             }
         } catch (err) {
             console.error('Unexpected error fetching profile', err);

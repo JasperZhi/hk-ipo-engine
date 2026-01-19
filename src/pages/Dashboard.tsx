@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { analyzeIPO } from '../../services/geminiService';
+import { analyzeIPO } from '../../services/deepSeekService';
 import { IPOAnalysis } from '../../types';
 import HealthCard from '../../components/HealthCard';
 import ScoringCard from '../../components/ScoringCard';
@@ -306,15 +306,26 @@ const Dashboard: React.FC = () => {
         try {
             const subMult = subscriptionMultiple.trim() || "未知 (Unknown)";
 
+            // [Antigravity Idea]: Log Search ATTEMPT immediately so Admin can see activity even if AI fails/throttles
+            if (user) {
+                supabase.from('search_logs').insert([
+                    {
+                        user_id: user.id,
+                        company_name: companyName, // Use input name
+                        stock_code: prospectusUrlInput.includes('hkex') ? 'Pending' : ''
+                    }
+                ]).then(({ error }) => {
+                    if (error) console.error("Failed to log search attempt:", error);
+                });
+            }
+
             const result = await analyzeIPO(
                 companyName,
                 subMult,
                 selectedFile || undefined,
                 prospectusUrlInput.trim() || undefined,
                 (msg) => {
-                    // Callback from service: update message and restart simulation from a new context if needed
                     setLoadingMessage(msg);
-                    // Only start the "AI thinking" simulation loop after the initial search/upload is triggered
                     if (msg.includes("HKEX")) {
                         startProgressSimulation();
                     }
@@ -323,19 +334,6 @@ const Dashboard: React.FC = () => {
 
             setData(result);
             saveToHistory(result);
-
-            // Log Search to Supabase
-            if (user) {
-                supabase.from('search_logs').insert([
-                    {
-                        user_id: user.id,
-                        company_name: result.companyName,
-                        stock_code: result.stockCode
-                    }
-                ]).then(({ error }) => {
-                    if (error) console.error("Failed to log search:", error);
-                });
-            }
 
             // Reset scroll
             window.scrollTo(0, 0);
