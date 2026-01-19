@@ -5,11 +5,7 @@ export default async function handler(req, res) {
     }
 
     const { companyName, subscriptionMultiple, prospectusUrlInput } = req.body;
-    const DEEPSEEK_API_KEY = process.env.VITE_DEEPSEEK_API_KEY;
-
-    if (!DEEPSEEK_API_KEY) {
-        return res.status(500).json({ error: 'DeepSeek API Key not configured on server' });
-    }
+    const DEEPSEEK_API_KEY = "sk-eac97e968fd24b1eadc2266ee61c8a39";
 
     const prompt = `
     You are a professional, rigorous, and fact-based Institutional IPO Analyst. 
