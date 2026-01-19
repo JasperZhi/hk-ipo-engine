@@ -1,7 +1,7 @@
 import { IPOAnalysis } from "../types";
 
 const DEEPSEEK_API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY;
-const API_URL = "/api/deepseek/chat/completions";
+const API_URL = "/api/analyze";
 
 export const analyzeIPO = async (
     companyName: string,
@@ -44,31 +44,21 @@ export const analyzeIPO = async (
         const response = await fetch(API_URL, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                model: model,
-                messages: [
-                    { role: "system", content: "You are a professional financial analyst. Always output valid JSON." },
-                    { role: "user", content: prompt }
-                ],
-                response_format: { type: 'json_object' },
-                temperature: 0.1
+                companyName,
+                subscriptionMultiple,
+                prospectusUrlInput
             })
         });
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.error?.message || `DeepSeek API error: ${response.status}`);
+            throw new Error(errorData.error || `Server Error: ${response.status}`);
         }
 
-        const json = await response.json();
-        const content = json.choices[0].message.content;
-
-        if (onProgress) onProgress("分析完成，正在整理报告 (Cleaning up report)...");
-
-        const result = JSON.parse(content) as IPOAnalysis;
+        const result = await response.json() as IPOAnalysis;
 
         // Add metadata
         result.lastUpdated = new Date().toLocaleString();
